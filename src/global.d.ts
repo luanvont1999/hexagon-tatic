@@ -21,4 +21,5 @@ declare global {
   var cam: CameraProps;
   var prev: number;
   var deltaTime: number;
+  var cameraSpeed: number;
 }
