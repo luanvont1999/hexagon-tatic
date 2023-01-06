@@ -1,5 +1,4 @@
 export {}
-
 declare global {
   type Pos = {
     x: number;
@@ -12,6 +11,13 @@ declare global {
   type Hexagon = Pos & {
     size: number;
   }
+  type Axial = {
+    q: number;
+    r: number;
+  }
+  type Cube = Axial & {
+    s: number;
+  }
   type CameraProps = Rect & {
     zoom: number;
   };
@@ -22,4 +28,6 @@ declare global {
   var prev: number;
   var deltaTime: number;
   var cameraSpeed: number;
+
+  var HEX_SIZE: number;
 }

@@ -1,9 +1,12 @@
 import { update } from "js-coroutines";
-import Battle, { HexProps } from "./modules/Battle";
+import Battle from "./modules/Battle";
 import Camera from "./modules/Camera";
 import Canvas from "./modules/Canvas";
 import Draw from "./modules/Draw";
+import Hex from "./modules/Hex";
 import Keyboard, { Key } from "./modules/Keyboard";
+
+import "./constants";
 import "./style.css";
 
 const CANVAS = document.createElement("canvas");
@@ -17,22 +20,16 @@ APP.appendChild(CANVAS);
 
 document.body.appendChild(APP);
 
-const hexSize = 50
 const battle = new Battle([])
 
-update(function* (): any {
-  for (let r = 0; r < 6; r++) {
-    if (battle.board.length < r + 1) {
-      battle.board.push([])
-    }
-    for (let q = 0; q < 6; q++) {
-      battle.board[r].push({ r, q: q - Math.floor(r / 2)})
-      for(let c = 0; c < 60; c++) {
-        yield
-      }
-    }
+for (let r = 0; r < 6; r++) {
+  if (battle.board.length < r + 1) {
+    battle.board.push([])
   }
-})
+  for (let q = 0; q < 6; q++) {
+    battle.board[r].push(new Hex({ r, q: q - Math.floor(r / 2)}))
+  }
+}
 
 const render = (): void => {
   Draw.clearScreen();

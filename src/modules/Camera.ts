@@ -1,3 +1,5 @@
+import { objFilterNaN } from "../helpers"
+
 const focus = (center: Pos): void => {
   const { width, height } = canvas
   global.cam = {
@@ -27,29 +29,27 @@ const zoom = (event: WheelEvent): void => {
   }
 }
 
-const rectInCam = (rect: Rect): Rect => {
-  return {
-    x: (rect.x + cam.x / 2) * cam.zoom,
-    y: (rect.y + cam.y / 2) * cam.zoom,
-    width: rect.width * cam.zoom,
-    height: rect.height * cam.zoom,
+const inCam = (res: number | Pos | Rect | Hexagon): any => {
+  if (typeof res === 'number') {
+    return (res * cam.zoom)
   }
-}
+  const { x, y, width, height, size} = res as Pos & Rect & Hexagon
+  const target = {
+    x: (x + cam.x / 2) * cam.zoom,
+    y: (y + cam.y / 2) * cam.zoom,
+    width: width * cam.zoom,
+    height: height * cam.zoom,
+    size: size * cam.zoom
+  }
 
-const hexInCam = (hex: Hexagon): Hexagon => {
-  return {
-    x: (hex.x + cam.x / 2) * cam.zoom,
-    y: (hex.y + cam.y / 2) * cam.zoom,
-    size: hex.size * cam.zoom
-  }
+  return objFilterNaN(target)
 }
 
 const Camera = {
   focus,
   move,
   zoom,
-  rectInCam,
-  hexInCam,
+  inCam,
 }
 
 export default Camera

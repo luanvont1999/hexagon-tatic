@@ -6,27 +6,35 @@ export const clearScreen = (): void => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 };
 
-export const Hex = (hex: Hexagon, color: string = "white") => {
-  const { x, y, size } = Camera.hexInCam(hex);
+export const drawHex = (hex: Hexagon, color: string = "white") => {
+  const { x, y, size } = Camera.inCam(hex);
   ctx.beginPath();
   for (var i = 0; i < 6; i++) {
     ctx.lineTo(x + size * Math.sin(A * i), y + size * Math.cos(A * i));
   }
   ctx.closePath();
-  ctx.strokeStyle = color;
-  ctx.stroke();
+  ctx.fillStyle = color;
+  ctx.fill();
 };
 
-export const Rect = (rect: Rect) => {
-  const { x, y, width, height } = Camera.rectInCam(rect);
+export const drawRect = (rect: Rect) => {
+  const { x, y, width, height } = Camera.inCam(rect);
   ctx.fillStyle = "white";
   ctx.fillRect(x, y, width, height);
 };
 
+export const drawText = (text: string, pos: Pos, color: string = 'black'): void => {
+  const { x, y } = Camera.inCam(pos)
+  ctx.font = '20px Arial'
+  ctx.fillStyle = color
+  ctx.fillText(text, x, y)
+}
+
 const Draw = {
   clearScreen,
-  Hex,
-  Rect,
+  drawHex,
+  drawRect,
+  drawText
 };
 
 export default Draw;
