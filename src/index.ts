@@ -45,9 +45,10 @@ const control = (): void => {
   const xAxis: number = +Keyboard.isPress(Key.RIGHT) - +Keyboard.isPress(Key.LEFT)
   const yAxis = +Keyboard.isPress(Key.DOWN) - +Keyboard.isPress(Key.TOP)
 
-  const speed = cameraSpeed * global.deltaTime / 1000 / global.cam.zoom
-
-  Camera.move({ x: xAxis * speed, y: yAxis * speed })
+  if (xAxis || yAxis) {
+    const speed = cameraSpeed * global.deltaTime / 1000 / global.cam.zoom
+    Camera.move({ x: xAxis * speed, y: yAxis * speed })
+  }
 } 
 
 const loop = (): void => {

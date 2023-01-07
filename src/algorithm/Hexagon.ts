@@ -1,5 +1,27 @@
 import Hex from "../modules/Hex"
 
+const axialDirectionVector: Hex[] = [
+  { q: +1, r: 0 }, { q: +1, r: -1 }, { q: 0, r: -1 },
+  { q: -1, r: 0 }, { q: -1, r: +1 }, { q: 0, r: +1 }
+]
+
+const axialDirection = (dir: number): Hex => {
+  return axialDirectionVector[dir]
+}
+
+const axialAdd = (hex: Hex, vec: Hex): Hex => {
+  return {
+    q: hex.q + vec.q,
+    r: hex.r + vec.r
+  }
+}
+
+const axialNeighbor = (hex: Hex, dir: number) => {
+  return axialAdd(hex, axialDirection(dir))
+}
+
+const getHexSize = (): number => HEX_SIZE * cam.zoom
+
 const cubeToAxial = (cube: Cube): Axial => {
   const q = cube.q
   const r = cube.r
@@ -39,9 +61,9 @@ const axialRound = (hex: Axial): Axial => {
   return cubeToAxial(cubeRound(axialToCube(hex)))
 }
 
-const pixelToHex = (pointer: Hexagon): Axial => {
-  const q = (Math.sqrt(3)/3 * pointer.x  -  1./3 * pointer.y) / pointer.size
-  const r = (                           2./3 * pointer.y) / pointer.size
+const pixelToHex = (pointer: Pos): Axial => {
+  const q = (Math.sqrt(3)/3 * pointer.x  -  1./3 * pointer.y) / getHexSize()
+  const r = (                           2./3 * pointer.y) / getHexSize()
 
   return axialRound({ q, r })
 }
@@ -54,6 +76,7 @@ const axialToStore = (hex: Axial): Axial => {
 }
 
 const Hexagon = {
+  axialNeighbor,
   cubeToAxial,
   axialToCube,
   cubeRound,

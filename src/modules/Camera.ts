@@ -14,8 +14,8 @@ const focus = (center: Pos): void => {
 const move = (vector: Pos) => {
   global.cam = {
     ...global.cam,
-    x: global.cam.x - vector.x,
-    y: global.cam.y - vector.y,
+    x: global.cam.x + vector.x,
+    y: global.cam.y + vector.y,
   }
 }
 
@@ -35,8 +35,8 @@ const inCam = (res: number | Pos | Rect | Hexagon): any => {
   }
   const { x, y, width, height, size} = res as Pos & Rect & Hexagon
   const target = {
-    x: (x + cam.x / 2) * cam.zoom,
-    y: (y + cam.y / 2) * cam.zoom,
+    x: (x - cam.x) * cam.zoom,
+    y: (y - cam.y) * cam.zoom,
     width: width * cam.zoom,
     height: height * cam.zoom,
     size: size * cam.zoom
@@ -45,11 +45,19 @@ const inCam = (res: number | Pos | Rect | Hexagon): any => {
   return objFilterNaN(target)
 }
 
+const mouseCam = (event: MouseEvent): Pos => {
+  return {
+    x: (event.offsetX + cam.x * cam.zoom),
+    y: (event.offsetY + cam.y * cam.zoom)
+  }
+}
+
 const Camera = {
   focus,
   move,
   zoom,
   inCam,
+  mouseCam
 }
 
 export default Camera
