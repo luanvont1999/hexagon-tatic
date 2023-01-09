@@ -66,15 +66,32 @@ class Battle {
     function* startMove(): Generator<any> {
       this.canAction = false
       let tick = 0
+      let currPos = this.select
+      let nextPos = this.path.splice(0, 1)[0]
       
       while (true) {
-        if (!this.path.length) break
-        if (tick > 100) {
+        if (tick >= 300) {
           tick = 0
-          const pos = this.path.splice(0, 1)
-          this.select = pos[0]
+          currPos = nextPos
+          if (!this.path.length) {
+            this.select = nextPos
+            break
+          }
+          nextPos = this.path.splice(0, 1)[0]
         }
+        
         tick += global.deltaTime
+        this.select = currPos
+
+        this.select = {
+          ...this.select,
+          r: Hexagon.lerp(currPos.r, nextPos.r, tick / 300),
+          q: Hexagon.lerp(currPos.q, nextPos.q, tick / 300)
+        }
+
+        // this.select.r = Hexagon.lerp(currPos.r, nextPos.r, tick / 300)
+        // this.select.q = Hexagon.lerp(currPos.q, nextPos.q, tick / 300)
+
         yield null
       }
 
@@ -88,8 +105,7 @@ class Battle {
   render() {
     this.board?.map((row) => {
       row?.map((hex) => {
-        const x = HEX_SIZE * (Math.sqrt(3) * hex.q + (Math.sqrt(3) / 2) * hex.r);
-        const y = HEX_SIZE * ((3 / 2) * hex.r);
+        const { x, y } = Hexagon.hexToPixel(hex)
 
         let color = hex.color
         if (this.select) {
@@ -109,14 +125,11 @@ class Battle {
     });
 
     if (this.select) {
-      const hex = this.select
-      const x = HEX_SIZE * (Math.sqrt(3) * hex.q + (Math.sqrt(3) / 2) * hex.r);
-      const y = HEX_SIZE * ((3 / 2) * hex.r);
+      const { x, y } = Hexagon.hexToPixel(this.select)
       Draw.drawHex({ x, y, size: HEX_SIZE }, 'green')
     }
     this.path?.length && this.path?.forEach(hex => {
-      const x = HEX_SIZE * (Math.sqrt(3) * hex.q + (Math.sqrt(3) / 2) * hex.r);
-      const y = HEX_SIZE * ((3 / 2) * hex.r);
+      const { x, y } = Hexagon.hexToPixel(hex)
       Draw.drawHex({ x, y, size: HEX_SIZE * 0.3}, 'orange')
     })
   }

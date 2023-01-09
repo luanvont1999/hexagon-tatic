@@ -81,6 +81,13 @@ const axialRound = (hex: Axial): Axial => {
   return cubeToAxial(cubeRound(axialToCube(hex)))
 }
 
+const hexToPixel = (hex: Hex): Pos => {
+  return {
+    x: HEX_SIZE * (Math.sqrt(3) * hex.q + (Math.sqrt(3) / 2) * hex.r),
+    y: HEX_SIZE * ((3 / 2) * hex.r)
+  }
+}
+
 const pixelToHex = (pointer: Pos): Axial => {
   const q = (Math.sqrt(3)/3 * pointer.x  -  1./3 * pointer.y) / getHexSize()
   const r = (                           2./3 * pointer.y) / getHexSize()
@@ -95,6 +102,10 @@ const axialToStore = (hex: Axial): Axial => {
   }
 }
 
+const lerp = (a: number, b: number, t: number) => {
+  return a + (b - a) * t
+}
+
 const Hexagon = {
   axialDistance,
   axialNeighbor,
@@ -104,7 +115,9 @@ const Hexagon = {
   cubeRound,
   axialRound,
   pixelToHex,
+  hexToPixel,
   axialToStore,
+  lerp
 }
 
 export default Hexagon
