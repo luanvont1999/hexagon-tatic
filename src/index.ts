@@ -57,8 +57,9 @@ const loop = (): void => {
   global.deltaTime = (now - global.prev)
   global.prev = now
 
-  animCallback.forEach(callback => {
-    callback.next()
+  animCallback.forEach((callback, index) => {
+    const { done } = callback.next()
+    done && animCallback.splice(index, 1)
   })
 
   control();

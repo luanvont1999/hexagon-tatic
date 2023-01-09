@@ -57,6 +57,7 @@ class Battle {
       this.hover = _hover
       if (this.select) {
         this.path = AStar.search(this.board, this.select, this.hover)
+        this.path.splice(0, 1)
       }
     }
   }
@@ -65,7 +66,6 @@ class Battle {
     function* startMove(): Generator<any> {
       this.canAction = false
       let tick = 0
-      this.path.splice(0, 1)
       
       while (true) {
         if (!this.path.length) break
@@ -100,22 +100,25 @@ class Battle {
             }
           }
         }
-        if (this.select?.r === hex.r && this.select?.q === hex.q) color = 'green'
-        if (this.target?.r === hex.r && this.target?.q === hex.q) color = 'red'
         if (hex.block) color = 'gray'
 
         Draw.drawHex({ x, y, size: HEX_SIZE }, color)
 
-        if (this.path.length) {
-          if (this.path.some(x => x.r === hex.r && x.q === hex.q)) {
-            color = 'yellow'
-            Draw.drawHex({ x, y, size: HEX_SIZE * 0.3}, color)
-          }
-        }
-
         // Draw.drawText(`[${hex.r}, ${hex.q}]`, { x: x - 25, y: y + 10 })
       });
     });
+
+    if (this.select) {
+      const hex = this.select
+      const x = HEX_SIZE * (Math.sqrt(3) * hex.q + (Math.sqrt(3) / 2) * hex.r);
+      const y = HEX_SIZE * ((3 / 2) * hex.r);
+      Draw.drawHex({ x, y, size: HEX_SIZE }, 'green')
+    }
+    this.path?.length && this.path?.forEach(hex => {
+      const x = HEX_SIZE * (Math.sqrt(3) * hex.q + (Math.sqrt(3) / 2) * hex.r);
+      const y = HEX_SIZE * ((3 / 2) * hex.r);
+      Draw.drawHex({ x, y, size: HEX_SIZE * 0.3}, 'orange')
+    })
   }
 }
 
