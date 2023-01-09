@@ -13,6 +13,7 @@ const CANVAS = document.createElement("canvas");
 global.canvas = CANVAS;
 global.ctx = CANVAS.getContext("2d");
 global.cameraSpeed = 1000;
+global.animCallback = [];
 
 const APP = document.createElement("div");
 APP.id = "app";
@@ -55,6 +56,10 @@ const loop = (): void => {
   const now = new Date().getTime()
   global.deltaTime = (now - global.prev)
   global.prev = now
+
+  animCallback.forEach(callback => {
+    callback.next()
+  })
 
   control();
   render();

@@ -28,6 +28,7 @@ declare global {
   var prev: number;
   var deltaTime: number;
   var cameraSpeed: number;
+  var animCallback: Array<any>;
 
   var HEX_SIZE: number;
 }

@@ -13,6 +13,8 @@ class Battle {
   path: Hex[] = [];
   target: Hex;
   astar: any;
+  count: number = 0;
+  canAction: boolean = true
 
   constructor(board: BoardProps) {
     this.board = board;
@@ -22,20 +24,29 @@ class Battle {
   }
 
   mouseClickHandler (event: MouseEvent) {
+    if (!this.canAction) return
     const { shiftKey } = event
     const { x, y } = Camera.mouseCam(event)
     const hex = Hexagon.pixelToHex({ x, y })
     const { r, q } = Hexagon.axialToStore(hex)
     if (r >= this.board.length || r < 0) return
     if (!shiftKey && !this.board[r][q].block) {
-      this.select = this.board[r][q]
+      if (this.select) {
+        if (this.board[r][q] === this.select) {
+          this.select = null
+        } else {
+          this.move()
+        }
+      } else {
+        this.select = this.board[r][q]
+      }
     } else {
       this.board[r][q].block = true
     }
   }
 
   mouseMoveHandler (event: MouseEvent) {
-    if (!this.select) return
+    if (!this.select || !this.canAction) return
     const { x, y } = Camera.mouseCam(event)
 
     const hex = Hexagon.pixelToHex({ x, y })
@@ -48,6 +59,30 @@ class Battle {
         this.path = AStar.search(this.board, this.select, this.hover)
       }
     }
+  }
+
+  move () {
+    function* startMove(): Generator<any> {
+      this.canAction = false
+      let tick = 0
+      this.path.splice(0, 1)
+      
+      while (true) {
+        if (!this.path.length) break
+        if (tick > 100) {
+          tick = 0
+          const pos = this.path.splice(0, 1)
+          this.select = pos[0]
+        }
+        tick += global.deltaTime
+        yield null
+      }
+
+      this.canAction = true
+    }
+    const iter = startMove.bind(this)()
+
+    animCallback.push(iter)
   }
 
   render() {
@@ -65,8 +100,8 @@ class Battle {
             }
           }
         }
-        if (this.select === hex) color = 'green'
-        if (this.target === hex) color = 'red'
+        if (this.select?.r === hex.r && this.select?.q === hex.q) color = 'green'
+        if (this.target?.r === hex.r && this.target?.q === hex.q) color = 'red'
         if (hex.block) color = 'gray'
 
         Draw.drawHex({ x, y, size: HEX_SIZE }, color)
