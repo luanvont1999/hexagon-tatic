@@ -16,8 +16,28 @@ const axialAdd = (hex: Hex, vec: Hex): Hex => {
   }
 }
 
+const axialSubtract = (a: Hex, b: Hex): Hex => {
+  return {
+    q: a.q - b.q,
+    r: a.r - b.r
+  }
+}
+
 const axialNeighbor = (hex: Hex, dir: number) => {
   return axialAdd(hex, axialDirection(dir))
+}
+
+const axialDistance = (hexStart: Hex, hexEnd: Hex): number => {
+  const vec = axialSubtract(hexStart, hexEnd)
+  return (Math.abs(vec.q) + Math.abs(vec.q + vec.r) + Math.abs(vec.r)) / 2
+}
+
+const getAxialNeighbors = (hex: Hex): Array<Hex> => {
+  let neighbors = []
+  for (let i = 0; i < 6; i++) {
+    neighbors.push(axialNeighbor(hex, i))
+  }
+  return neighbors
 }
 
 const getHexSize = (): number => HEX_SIZE * cam.zoom
@@ -76,7 +96,9 @@ const axialToStore = (hex: Axial): Axial => {
 }
 
 const Hexagon = {
+  axialDistance,
   axialNeighbor,
+  getAxialNeighbors,
   cubeToAxial,
   axialToCube,
   cubeRound,

@@ -45,10 +45,11 @@ const inCam = (res: number | Pos | Rect | Hexagon): any => {
   return objFilterNaN(target)
 }
 
-const mouseCam = (event: MouseEvent): Pos => {
+const mouseCam = (event: MouseEvent): MouseEvent => {
   return {
+    ...event,
     x: (event.offsetX + cam.x * cam.zoom),
-    y: (event.offsetY + cam.y * cam.zoom)
+    y: (event.offsetY + cam.y * cam.zoom),
   }
 }
 

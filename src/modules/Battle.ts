@@ -1,4 +1,5 @@
 import Hexagon from "../algorithm/Hexagon";
+import AStar from "../algorithm/PathFinding";
 import Camera from "./Camera";
 import Draw from "./Draw";
 import Hex from "./Hex";
@@ -9,6 +10,9 @@ class Battle {
   board: BoardProps;
   select: Hex;
   hover: Hex;
+  path: Hex[] = [];
+  target: Hex;
+  astar: any;
 
   constructor(board: BoardProps) {
     this.board = board;
@@ -18,26 +22,32 @@ class Battle {
   }
 
   mouseClickHandler (event: MouseEvent) {
+    const { shiftKey } = event
     const { x, y } = Camera.mouseCam(event)
     const hex = Hexagon.pixelToHex({ x, y })
     const { r, q } = Hexagon.axialToStore(hex)
     if (r >= this.board.length || r < 0) return
-    if (this.select === this.board[r][q]) {
-      this.select = null
-      return
-    } else {
+    if (!shiftKey && !this.board[r][q].block) {
       this.select = this.board[r][q]
-      console.log(this.select)
+    } else {
+      this.board[r][q].block = true
     }
   }
 
   mouseMoveHandler (event: MouseEvent) {
+    if (!this.select) return
     const { x, y } = Camera.mouseCam(event)
 
     const hex = Hexagon.pixelToHex({ x, y })
     const { r, q } = Hexagon.axialToStore(hex)
     if (r >= this.board.length || r < 0) return
-    this.hover = this.board[r][q]
+    const _hover = this.board[r][q]
+    if (_hover !== this.hover) {
+      this.hover = _hover
+      if (this.select) {
+        this.path = AStar.search(this.board, this.select, this.hover)
+      }
+    }
   }
 
   render() {
@@ -55,10 +65,20 @@ class Battle {
             }
           }
         }
-        if (this.select === hex) color = 'red'
+        if (this.select === hex) color = 'green'
+        if (this.target === hex) color = 'red'
+        if (hex.block) color = 'gray'
 
         Draw.drawHex({ x, y, size: HEX_SIZE }, color)
-        Draw.drawText(`[${hex.r}, ${hex.q}]`, { x: x - 25, y: y + 10 })
+
+        if (this.path.length) {
+          if (this.path.some(x => x.r === hex.r && x.q === hex.q)) {
+            color = 'yellow'
+            Draw.drawHex({ x, y, size: HEX_SIZE * 0.3}, color)
+          }
+        }
+
+        // Draw.drawText(`[${hex.r}, ${hex.q}]`, { x: x - 25, y: y + 10 })
       });
     });
   }

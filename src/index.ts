@@ -22,11 +22,11 @@ document.body.appendChild(APP);
 
 const battle = new Battle([])
 
-for (let r = 0; r < 6; r++) {
+for (let r = 0; r < 10; r++) {
   if (battle.board.length < r + 1) {
     battle.board.push([])
   }
-  for (let q = 0; q < 6; q++) {
+  for (let q = 0; q < 10; q++) {
     battle.board[r].push(new Hex({ r, q: q - Math.floor(r / 2)}))
   }
 }
@@ -66,7 +66,7 @@ const init = (): void => {
   global.prev = new Date().getTime()
   // Resize canvas and focus to center
   Canvas.resize();
-  Camera.focus(Canvas.getCenter());
+  Camera.focus({ x: 0 + 300, y: 0 + 200});
   Keyboard.bindEvent();
   window.addEventListener("resize", Canvas.resize);
   window.addEventListener("wheel", (event) => {
