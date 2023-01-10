@@ -13,7 +13,7 @@ class Character {
   frame: number = 0;
   maxFrame: number = 0;
   status: CHAR_STATUS = CHAR_STATUS.IDLE;
-  dir: -1 | 1 = 1;
+  dir: -1 | 1 = -1;
 
   constructor ({
     hex = null
@@ -62,7 +62,6 @@ class Character {
         this.frame = 0;
       }
     }
-    console.log(this.status)
   }
   
 

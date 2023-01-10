@@ -37,6 +37,7 @@ class Hex {
       let tick = 0
       let currPos = {...this}
       let nextPos = path.splice(0, 1)[0]
+      this.owner.dir = Hexagon.axialIsLeft(nextPos, currPos) ? -1 : 1
       
       while (true) {
         this.updatePos({
@@ -45,7 +46,6 @@ class Hex {
         })
 
         if (tick >= 500) {
-          this.owner.dir = currPos.q > nextPos.q ? -1 : 1
           tick = 0
           currPos = nextPos
           if (!path.length) {
@@ -53,6 +53,7 @@ class Hex {
             break
           }
           nextPos = path.splice(0, 1)[0]
+          this.owner.dir = Hexagon.axialIsLeft(nextPos, currPos) ? -1 : 1
         }
         tick += global.deltaTime
 

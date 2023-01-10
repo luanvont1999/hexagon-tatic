@@ -5,6 +5,8 @@ const axialDirectionVector: AxialHex[] = [
   { q: -1, r: 0 }, { q: -1, r: +1 }, { q: 0, r: +1 }
 ]
 
+const leftIndex = [2, 3, 4]
+
 const axialDirection = (dir: number): AxialHex => {
   return axialDirectionVector[dir]
 }
@@ -21,6 +23,16 @@ const axialSubtract = (a: AxialHex, b: AxialHex): AxialHex => {
     q: a.q - b.q,
     r: a.r - b.r
   }
+}
+
+const axialEqual = (a: AxialHex, b: AxialHex): boolean => {
+  return a.r === b.r && a.q === b.q
+}
+ 
+const axialIsLeft = (a: AxialHex, b: AxialHex): boolean => {
+  const sub = axialSubtract(a, b)
+  const index = axialDirectionVector.findIndex(hex => axialEqual(hex, sub))
+  return leftIndex.includes(index)
 }
 
 const axialNeighbor = (hex: AxialHex, dir: number) => {
@@ -107,6 +119,9 @@ const lerp = (a: number, b: number, t: number) => {
 }
 
 const Hexagon = {
+  axialAdd,
+  axialSubtract,
+  axialIsLeft,
   axialDistance,
   axialNeighbor,
   getAxialNeighbors,

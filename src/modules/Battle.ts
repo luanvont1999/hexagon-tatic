@@ -21,6 +21,9 @@ class Battle {
   constructor(board: BoardProps) {
     this.board = board;
 
+    this.select = new Hex(this.board[3][3])
+    this.select.owner = new Character({ hex: this.select })
+
     canvas.addEventListener('click', this.mouseClickHandler.bind(this))
     canvas.addEventListener('mousemove', this.mouseMoveHandler.bind(this))
   }
@@ -30,11 +33,9 @@ class Battle {
     const { shiftKey } = event
     const { r, q } = Hexagon.pixelToHex(Camera.mouseCam(event))
     const { x, y } = Hexagon.axialToStore({ r, q })
-    console.log({ x, y})
     if (r >= this.board.length || r < 0) return
 
     if (shiftKey) {
-      console.log(this.board[x][y])
       this.board[x][y].block = !this.board[x][y].block
       return
     }
@@ -58,9 +59,9 @@ class Battle {
 
     const { x, y } = Hexagon.axialToStore(hex)
 
-    if (x >= this.board.length || x < 0) return
+    if (x >= this.board.length || x < 0 || y < 0 || y >= this.board[x].length) return
 
-    if (this.board[x][y].block) return
+    if (this.board[x][y]?.block) return
 
     const _hover = new Hex(this.board[x][y])
     if (_hover !== this.hover) {

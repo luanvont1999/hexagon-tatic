@@ -21,16 +21,16 @@ APP.appendChild(CANVAS);
 
 document.body.appendChild(APP);
 
-const battle = new Battle([])
-
+const board = []
 for (let r = 0; r < 10; r++) {
-  if (battle.board.length < r + 1) {
-    battle.board.push([])
+  if (board.length < r + 1) {
+    board.push([])
   }
   for (let q = 0; q < 10; q++) {
-    battle.board[r].push(new Hex({ r, q: q - Math.floor(r / 2)}))
+    board[r].push(new Hex({ r, q: q - Math.floor(r / 2)}))
   }
 }
+const battle = new Battle(board)
 
 const render = (): void => {
   Draw.clearScreen();
