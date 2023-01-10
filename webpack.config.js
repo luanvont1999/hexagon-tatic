@@ -1,50 +1,56 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
- mode: 'development',
+  mode: "development",
   entry: {
-    index: './src/index.ts',
+    index: "./src/index.ts",
   },
   output: {
-    filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'docs'),
+    filename: "[name].bundle.js",
+    path: path.resolve(__dirname, "docs"),
     clean: true,
   },
   plugins: [
     new HtmlWebpackPlugin({
-     title: 'Output Management',
-     title: 'Development',
-     template: './src/index.html'
+      title: "Output Management",
+      title: "Development",
+      template: "./src/index.html",
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: "src/assets", to: "assets" }, //to the dist root directory
+      ],
     }),
   ],
   devServer: {
-    static: './docs',
+    static: "./docs",
   },
   optimization: {
-    runtimeChunk: 'single',
+    runtimeChunk: "single",
   },
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: "ts-loader",
         exclude: /node_modules/,
       },
       {
         test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
+        use: ["style-loader", "css-loader"],
       },
       {
         test: /\.(png|jpe?g|gif|svg|eot|ttf|woff|woff2)$/i,
-        loader: 'file-loader',
+        loader: "file-loader",
         options: {
-          name: '[path][name].[ext]',
+          name: "[path][name].[ext]",
         },
       },
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: [".tsx", ".ts", ".js"],
   },
 };
