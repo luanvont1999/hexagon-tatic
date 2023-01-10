@@ -21,6 +21,10 @@ declare global {
   type CameraProps = Rect & {
     zoom: number;
   };
+  type Coroutine = {
+    generator: Generator;
+    onDone: () => void;
+  }
 
   var canvas: HTMLCanvasElement;
   var ctx: CanvasRenderingContext2D;

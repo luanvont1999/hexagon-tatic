@@ -3,6 +3,7 @@ import AStar from "../algorithm/PathFinding";
 import Camera from "./Camera";
 import Draw from "./Draw";
 import Hex from "./Hex";
+import System from "./System";
 
 type BoardProps = Array<Array<Hex & { color?: string }>>;
 
@@ -62,9 +63,12 @@ class Battle {
     }
   }
 
-  move () {
+  async move () {
+    this.canAction = false
+    
     function* startMove(): Generator<any> {
-      this.canAction = false
+      if (!this.path.length) return
+
       let tick = 0
       let currPos = this.select
       let nextPos = this.path.splice(0, 1)[0]
@@ -94,12 +98,12 @@ class Battle {
 
         yield null
       }
-
-      this.canAction = true
     }
-    const iter = startMove.bind(this)()
+    
+    await System.startCoroutine(startMove.bind(this))
+    console.log('move done')
 
-    animCallback.push(iter)
+    this.canAction = true
   }
 
   render() {
