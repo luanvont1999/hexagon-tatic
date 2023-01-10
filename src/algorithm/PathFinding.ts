@@ -27,10 +27,10 @@ const AStar = {
       for (let y = 0; y < grid[x].length; y++) {
         const _neighbors = Hexagon.getAxialNeighbors(grid[x][y])
         for (let neighbor of _neighbors) {
-          const { r, q } = Hexagon.axialToStore(neighbor)
-          if (r < 0  || r >= grid.length  || q >= grid[x].length || q < 0) continue
-          if (!grid[r][q].block) {
-            grid[x][y].neighbors.push(grid[r][q])
+          const { x: _x, y: _y } = Hexagon.axialToStore(neighbor)
+          if (_x < 0  || _x >= grid.length  || _y >= grid[x].length || _y < 0) continue
+          if (!grid[_x][_y].block) {
+            grid[x][y].neighbors.push(grid[_x][_y])
           }
         }
       }
@@ -39,13 +39,16 @@ const AStar = {
     return grid
   },
 
+  getBoardHex: function (hex: AxialHex, grid: Array<Array<AStarNode>>): AStarNode {
+    const { x, y } = Hexagon.axialToStore(hex)
+    return grid[x][y]
+  },
+
   search: function (board: Array<Array<Hex>>, _start: AxialHex, _end: AxialHex): AxialHex[] {
     const grid = AStar.init(board as Array<Array<AStarNode>>)
 
-    const { r: rStart, q: qStart } = Hexagon.axialToStore(_start)
-    const { r: rEnd, q: qEnd } = Hexagon.axialToStore(_end)
-    const start = grid[rStart][qStart]
-    const end = grid[rEnd][qEnd]
+    const start = AStar.getBoardHex(_start, grid)
+    const end = AStar.getBoardHex(_end, grid)
 
     let openList: AStarNode[] = []
     let closedList: AStarNode[] = []

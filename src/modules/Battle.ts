@@ -28,42 +28,46 @@ class Battle {
   async mouseClickHandler (event: MouseEvent) {
     if (!this.canAction) return
     const { shiftKey } = event
-    const { x, y } = Camera.mouseCam(event)
-    const hex = Hexagon.pixelToHex({ x, y })
-    const { r, q } = Hexagon.axialToStore(hex)
+    const { r, q } = Hexagon.pixelToHex(Camera.mouseCam(event))
+    const { x, y } = Hexagon.axialToStore({ r, q })
+    console.log({ x, y})
     if (r >= this.board.length || r < 0) return
-    if (!shiftKey && !this.board[r][q].block) {
-      if (this.select) {
-        if (this.select.r === r && this.select.q === q) {
-          this.select = null
-        } else {
-          this.canAction = false
-          await this.select.move(this.path)
-          this.canAction = true
-        }
-      } else {
-        this.select = new Hex(this.board[r][q])
-        this.select.owner = new Character({ hex: this.select })
+
+    if (shiftKey) {
+      console.log(this.board[x][y])
+      this.board[x][y].block = !this.board[x][y].block
+      return
+    }
+
+    if (this.select) {
+      if (!this.board[x][y].block) {
+        this.canAction = false
+        await this.select.move(this.path)
+        this.canAction = true
       }
     } else {
-      this.board[r][q].block = true
+      this.select = new Hex(this.board[x][y])
+      this.select.owner = new Character({ hex: this.select })
     }
   }
 
   mouseMoveHandler (event: MouseEvent) {
     if (!this.select || !this.canAction) return
-    const { x, y } = Camera.mouseCam(event)
 
-    const hex = Hexagon.pixelToHex({ x, y })
-    const { r, q } = Hexagon.axialToStore(hex)
-    if (r >= this.board.length || r < 0) return
-    const _hover = this.board[r][q]
+    const hex = Hexagon.pixelToHex(Camera.mouseCam(event))
+
+    const { x, y } = Hexagon.axialToStore(hex)
+
+    if (x >= this.board.length || x < 0) return
+
+    if (this.board[x][y].block) return
+
+    const _hover = new Hex(this.board[x][y])
     if (_hover !== this.hover) {
       this.hover = _hover
-      if (this.select) {
-        this.path = AStar.search(this.board, this.select, this.hover)
-        this.path.splice(0, 1)
-      }
+
+      this.path = AStar.search(this.board, this.select, this.hover)
+      this.path.splice(0, 1)
     }
   }
 
@@ -85,13 +89,11 @@ class Battle {
 
         Draw.drawHex({ x, y, size: HEX_SIZE }, color)
 
-        // Draw.drawText(`[${hex.r}, ${hex.q}]`, { x: x - 25, y: y + 10 })
       });
     });
 
     if (this.select) {
       const { x, y } = Hexagon.hexToPixel(this.select)
-      // Draw.drawHex({ x, y, size: HEX_SIZE }, 'lightgreen')
       
       this.select?.owner?.render()
     }

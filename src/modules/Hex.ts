@@ -45,6 +45,7 @@ class Hex {
         })
 
         if (tick >= 500) {
+          this.owner.dir = currPos.q > nextPos.q ? -1 : 1
           tick = 0
           currPos = nextPos
           if (!path.length) {

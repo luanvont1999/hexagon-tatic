@@ -95,10 +95,10 @@ const pixelToHex = (pointer: Pos): AxialHex => {
   return axialRound({ q, r })
 }
 
-const axialToStore = (hex: AxialHex): AxialHex => {
+const axialToStore = (hex: AxialHex): Pos => {
   return {
-    r: hex.r,
-    q: hex.q + Math.floor(hex.r / 2)
+    x: hex.r,
+    y: hex.q + Math.floor(hex.r / 2)
   }
 }
 

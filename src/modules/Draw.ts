@@ -32,9 +32,10 @@ export const drawText = (text: string, pos: Pos, color: string = 'black'): void 
   ctx.fillText(text, x, y)
 }
 
-export const drawImage = (source: CanvasImageSource, pos: Pos, frame: number = 0, row: number = 0): void => {
-  const { x, y } = Camera.inCam(pos)
+export const drawImage = (source: CanvasImageSource, pos: Pos, frame: number = 0, row: number = 0, dir: -1 | 1): void => {
+  let { x, y } = Camera.inCam(pos)
   const scale = Camera.inCam(HEX_SIZE / 720 * 2)
+  ctx.save()
   ctx.drawImage(
     source,
     frame * 720,
@@ -46,6 +47,7 @@ export const drawImage = (source: CanvasImageSource, pos: Pos, frame: number = 0
     720 * scale,
     490 * scale
   )
+  ctx.restore()
 }
 
 const Draw = {
