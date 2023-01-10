@@ -1,6 +1,7 @@
 import Hexagon from "../algorithm/Hexagon";
 import AStar from "../algorithm/PathFinding";
 import Camera from "./Camera";
+import Character from "./Character";
 import Draw from "./Draw";
 import Hex from "./Hex";
 import System from "./System";
@@ -11,7 +12,7 @@ class Battle {
   board: BoardProps;
   select: Hex;
   hover: Hex;
-  path: Hex[] = [];
+  path: AxialHex[] = [];
   target: Hex;
   astar: any;
   count: number = 0;
@@ -24,7 +25,7 @@ class Battle {
     canvas.addEventListener('mousemove', this.mouseMoveHandler.bind(this))
   }
 
-  mouseClickHandler (event: MouseEvent) {
+  async mouseClickHandler (event: MouseEvent) {
     if (!this.canAction) return
     const { shiftKey } = event
     const { x, y } = Camera.mouseCam(event)
@@ -33,13 +34,16 @@ class Battle {
     if (r >= this.board.length || r < 0) return
     if (!shiftKey && !this.board[r][q].block) {
       if (this.select) {
-        if (this.board[r][q] === this.select) {
+        if (this.select.r === r && this.select.q === q) {
           this.select = null
         } else {
-          this.move()
+          this.canAction = false
+          await this.select.move(this.path)
+          this.canAction = true
         }
       } else {
-        this.select = this.board[r][q]
+        this.select = new Hex(this.board[r][q])
+        this.select.owner = new Character({ hex: this.select })
       }
     } else {
       this.board[r][q].block = true
@@ -61,49 +65,6 @@ class Battle {
         this.path.splice(0, 1)
       }
     }
-  }
-
-  async move () {
-    this.canAction = false
-    
-    function* startMove(): Generator<any> {
-      if (!this.path.length) return
-
-      let tick = 0
-      let currPos = this.select
-      let nextPos = this.path.splice(0, 1)[0]
-      
-      while (true) {
-        if (tick >= 300) {
-          tick = 0
-          currPos = nextPos
-          if (!this.path.length) {
-            this.select = nextPos
-            break
-          }
-          nextPos = this.path.splice(0, 1)[0]
-        }
-        
-        tick += global.deltaTime
-        this.select = currPos
-
-        this.select = {
-          ...this.select,
-          r: Hexagon.lerp(currPos.r, nextPos.r, tick / 300),
-          q: Hexagon.lerp(currPos.q, nextPos.q, tick / 300)
-        }
-
-        // this.select.r = Hexagon.lerp(currPos.r, nextPos.r, tick / 300)
-        // this.select.q = Hexagon.lerp(currPos.q, nextPos.q, tick / 300)
-
-        yield null
-      }
-    }
-    
-    await System.startCoroutine(startMove.bind(this))
-    console.log('move done')
-
-    this.canAction = true
   }
 
   render() {
@@ -130,7 +91,9 @@ class Battle {
 
     if (this.select) {
       const { x, y } = Hexagon.hexToPixel(this.select)
-      Draw.drawHex({ x, y, size: HEX_SIZE }, 'green')
+      // Draw.drawHex({ x, y, size: HEX_SIZE }, 'lightgreen')
+      
+      this.select?.owner?.render()
     }
     this.path?.length && this.path?.forEach(hex => {
       const { x, y } = Hexagon.hexToPixel(hex)

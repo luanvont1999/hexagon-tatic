@@ -11,11 +11,11 @@ declare global {
   type Hexagon = Pos & {
     size: number;
   }
-  type Axial = {
+  type AxialHex = {
     q: number;
     r: number;
   }
-  type Cube = Axial & {
+  type CubeHex = AxialHex & {
     s: number;
   }
   type CameraProps = Rect & {

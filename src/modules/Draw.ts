@@ -1,5 +1,7 @@
 import Camera from "./Camera";
 
+const spriteSheet = document.getElementById('sprite') as CanvasImageSource
+
 const A = (2 * Math.PI) / 6;
 
 export const clearScreen = (): void => {
@@ -30,11 +32,28 @@ export const drawText = (text: string, pos: Pos, color: string = 'black'): void 
   ctx.fillText(text, x, y)
 }
 
+export const drawImage = (source: CanvasImageSource, pos: Pos, frame: number = 0, row: number = 0): void => {
+  const { x, y } = Camera.inCam(pos)
+  const scale = Camera.inCam(HEX_SIZE / 720 * 2)
+  ctx.drawImage(
+    source,
+    frame * 720,
+    row * 490,
+    720,
+    490,
+    x - 720 * scale / 2,
+    y - 490 * scale / 2,
+    720 * scale,
+    490 * scale
+  )
+}
+
 const Draw = {
   clearScreen,
   drawHex,
   drawRect,
-  drawText
+  drawText,
+  drawImage
 };
 
 export default Draw;

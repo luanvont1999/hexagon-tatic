@@ -39,7 +39,7 @@ const AStar = {
     return grid
   },
 
-  search: function (board: Array<Array<Hex>>, _start: Axial, _end: Axial): Axial[] {
+  search: function (board: Array<Array<Hex>>, _start: AxialHex, _end: AxialHex): AxialHex[] {
     const grid = AStar.init(board as Array<Array<AStarNode>>)
 
     const { r: rStart, q: qStart } = Hexagon.axialToStore(_start)
