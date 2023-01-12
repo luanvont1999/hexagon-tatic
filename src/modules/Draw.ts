@@ -34,18 +34,18 @@ export const drawText = (text: string, pos: Pos, color: string = 'black'): void 
 
 export const drawImage = (source: CanvasImageSource, pos: Pos, frame: number = 0, row: number = 0, dir: -1 | 1 = 1): void => {
   let { x, y } = Camera.inCam(pos)
-  const scale = Camera.inCam(HEX_SIZE / 720 * 2)
+  const scale = Camera.inCam(HEX_SIZE / 720 * 4)
   ctx.save()
   if (dir === -1) {
     ctx.translate(
       x + 720 * scale / 2,
-      y - 490 * scale / 2
+      y - (490 + 250) * scale / 2
     )
     ctx.scale(-1, 1)
   } else {
     ctx.translate(
       x - 720 * scale / 2,
-      y - 490 * scale / 2
+      y - (490 + 250) * scale / 2
     )
   }
   ctx.drawImage(

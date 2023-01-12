@@ -7,6 +7,15 @@ import Entity from "./Entity";
 
 type BoardProps = Array<Array<Hex & { color?: string }>>;
 
+const fakeBoardEntity = [
+  { pos: { x: 0, y: 1 }, side: 'ally' },
+  { pos: { x: 0, y: 3 }, side: 'ally' },
+  { pos: { x: 0, y: 5 }, side: 'ally' },
+  { pos: { x: 9, y: 1 }, side: 'enemy' },
+  { pos: { x: 9, y: 3 }, side: 'enemy' },
+  { pos: { x: 9, y: 5 }, side: 'enemy' },
+]
+
 class Battle {
   board: BoardProps;
   select: Hex;
@@ -23,11 +32,20 @@ class Battle {
   constructor(board: BoardProps) {
     this.board = board;
 
-    this.select = new Hex(this.board[3][3])
-    this.select.owner = new Entity({ hex: this.select })
+    fakeBoardEntity.forEach(unit => {
+      this.addHexEntity(unit.pos, unit.side === 'ally')
+    })
 
     canvas.addEventListener('click', this.mouseClickHandler.bind(this))
     canvas.addEventListener('mousemove', this.mouseMoveHandler.bind(this))
+  }
+
+  addHexEntity(pos: Pos, side: boolean) {
+    const arr = side ? this.allies : this.enemies
+    const hex = new Hex(this.board[pos.y][pos.x])
+    hex.owner = new Entity({ hex, dir: side ? 1 : -1 })
+    arr.push(hex)
+    this.board[pos.y][pos.x].block = true
   }
 
   async mouseClickHandler (event: MouseEvent) {
@@ -43,14 +61,21 @@ class Battle {
     }
 
     if (this.select) {
+      if (Hexagon.axialEqual(this.select, {r,q})) {
+        this.select = null
+        return
+      }
       if (!this.board[x][y].block) {
         this.canAction = false
+        const { x: xPrev, y: yPrev } = Hexagon.axialToStore(this.select)
+        this.board[xPrev][yPrev].block = false
         await this.select.move(this.path)
+        this.board[x][y].block = true
+        this.select = null
         this.canAction = true
       }
     } else {
-      this.select = new Hex(this.board[x][y])
-      this.select.owner = new Entity({ hex: this.select })
+      this.select = this.allies.find(hex => Hexagon.axialEqual(hex, { r, q})) || this.enemies.find(hex => Hexagon.axialEqual(hex, { r, q}))
     }
   }
 
@@ -69,9 +94,7 @@ class Battle {
     if (_hover.r !== this.hover?.r || _hover.q !== this.hover?.q) {
       this.hover = _hover
 
-      console.time("Finding");
       this.path = AStar.search(this.board, this.select, this.hover)
-      console.timeEnd("Finding");
       this.path.splice(0, 1)
     }
   }
@@ -97,11 +120,14 @@ class Battle {
       });
     });
 
-    if (this.select) {
-      const { x, y } = Hexagon.hexToPixel(this.select)
-      
-      this.select?.owner?.render()
-    }
+    this.allies?.length && this.allies.forEach(hex => {
+      const { x, y } = Hexagon.hexToPixel(hex)
+      hex?.owner?.render()
+    })
+    this.enemies?.length && this.enemies.forEach(hex => {
+      const { x, y } = Hexagon.hexToPixel(hex)
+      hex?.owner?.render()
+    })
     this.path?.length && this.path?.forEach(hex => {
       const { x, y } = Hexagon.hexToPixel(hex)
       Draw.drawHex({ x, y, size: HEX_SIZE * 0.3}, 'orange')

@@ -121,6 +121,7 @@ const lerp = (a: number, b: number, t: number) => {
 const Hexagon = {
   axialAdd,
   axialSubtract,
+  axialEqual,
   axialIsLeft,
   axialDistance,
   axialNeighbor,

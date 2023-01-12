@@ -1,31 +1,22 @@
-enum ENTITY_BASE_STAT {
+export enum BASE_STAT {
   STR = 'strength',
   AGI = 'agility',
   VIT = 'vitality',
   INT = 'intellegent',
 }
 
-enum ENTITY_COMPLEX_STAT {
-  HP = 'health_point',
-  MP = 'mana_point',
-  PD = 'physical_damgage',
-  MD = 'magical_damage',
-  AS = 'attack_speed',
-  MS = 'movement_speed',
-}
-
-type StatModifier = {
+export type StatModifier = {
   source: string;
   value: number;
 }
 
-class EntityStat {
+class Stat {
   name: string;
   baseValue: number;
   finalValue: number;
 
-  addModifier: StatModifier[];
-  ampModifier: StatModifier[];
+  addModifier: StatModifier[] = [];
+  ampModifier: StatModifier[] = [];
 
   constructor ({ name, value } : { name: string, value: number}) {
     this.name = name
@@ -40,10 +31,12 @@ class EntityStat {
   }
 
   calcFinalValue() {
-    const totalAdd = this.addModifier.reduce((total, each) => total + each.value, 0)
-    const totalAmp = this.ampModifier.reduce((total, each) => total + each.value, 0)
+    const totalAdd = this.addModifier?.reduce((total, each) => total + each.value, 0)
+    const totalAmp = this.ampModifier?.reduce((total, each) => total + each.value, 0)
 
     this.finalValue = this.baseValue * (1 + totalAmp / 100) + totalAdd
     return this.finalValue
   }
 }
+
+export default Stat
