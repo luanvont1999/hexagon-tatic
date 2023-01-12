@@ -22,7 +22,7 @@ APP.appendChild(CANVAS);
 document.body.appendChild(APP);
 
 const board = []
-for (let r = 0; r < 10; r++) {
+for (let r = 0; r < 8; r++) {
   if (board.length < r + 1) {
     board.push([])
   }

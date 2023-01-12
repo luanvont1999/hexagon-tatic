@@ -8,7 +8,7 @@ export enum CHAR_STATUS {
   IDLE = 0,
   WALK = 1
 }
-class Character {
+class Entity {
   hex: Hex;
   frame: number = 0;
   maxFrame: number = 0;
@@ -72,4 +72,4 @@ class Character {
   }
 }
 
-export default Character;
+export default Entity;

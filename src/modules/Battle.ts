@@ -1,10 +1,9 @@
 import Hexagon from "../algorithm/Hexagon";
 import AStar from "../algorithm/PathFinding";
 import Camera from "./Camera";
-import Character from "./Character";
 import Draw from "./Draw";
 import Hex from "./Hex";
-import System from "./System";
+import Entity from "./Entity";
 
 type BoardProps = Array<Array<Hex & { color?: string }>>;
 
@@ -18,11 +17,14 @@ class Battle {
   count: number = 0;
   canAction: boolean = true
 
+  allies: Hex[] = []
+  enemies: Hex[] = []
+
   constructor(board: BoardProps) {
     this.board = board;
 
     this.select = new Hex(this.board[3][3])
-    this.select.owner = new Character({ hex: this.select })
+    this.select.owner = new Entity({ hex: this.select })
 
     canvas.addEventListener('click', this.mouseClickHandler.bind(this))
     canvas.addEventListener('mousemove', this.mouseMoveHandler.bind(this))
@@ -48,7 +50,7 @@ class Battle {
       }
     } else {
       this.select = new Hex(this.board[x][y])
-      this.select.owner = new Character({ hex: this.select })
+      this.select.owner = new Entity({ hex: this.select })
     }
   }
 
@@ -64,10 +66,12 @@ class Battle {
     if (this.board[x][y]?.block) return
 
     const _hover = new Hex(this.board[x][y])
-    if (_hover !== this.hover) {
+    if (_hover.r !== this.hover?.r || _hover.q !== this.hover?.q) {
       this.hover = _hover
 
+      console.time("Finding");
       this.path = AStar.search(this.board, this.select, this.hover)
+      console.timeEnd("Finding");
       this.path.splice(0, 1)
     }
   }

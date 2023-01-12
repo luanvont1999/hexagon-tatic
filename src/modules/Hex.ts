@@ -1,5 +1,5 @@
 import Hexagon from "../algorithm/Hexagon";
-import Character, { CHAR_STATUS } from "./Character";
+import Character, { CHAR_STATUS } from "./Entity";
 import System from "./System";
 
 class Hex {
