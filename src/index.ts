@@ -18,19 +18,13 @@ global.animCallback = [];
 const APP = document.createElement("div");
 APP.id = "app";
 APP.appendChild(CANVAS);
+const btnStart = document.createElement('button')
+btnStart.innerText = 'START'
+btnStart.id = 'btn-start'
+// APP.appendChild(btnStart)
 
 document.body.appendChild(APP);
-
-const board = []
-for (let r = 0; r < 8; r++) {
-  if (board.length < r + 1) {
-    board.push([])
-  }
-  for (let q = 0; q < 10; q++) {
-    board[r].push(new Hex({ r, q: q - Math.floor(r / 2)}))
-  }
-}
-const battle = new Battle(board)
+const battle = new Battle([])
 
 const render = (): void => {
   Draw.clearScreen();

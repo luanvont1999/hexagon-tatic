@@ -1,3 +1,5 @@
+import colorHelpers from './color'
+
 export const objFilterNaN = (obj: object): any => {
   if (typeof obj !== 'object') return obj
 
@@ -11,5 +13,6 @@ export const objFilterNaN = (obj: object): any => {
 }
 
 export default {
-  objFilterNaN
+  ...colorHelpers,
+  objFilterNaN,
 }

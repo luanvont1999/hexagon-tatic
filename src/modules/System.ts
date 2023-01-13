@@ -9,8 +9,20 @@ const startCoroutine = (callback: any): Promise<void> => {
   })
 }
 
+const sleep = async (duration: number) => {
+  await System.startCoroutine(function* (): Generator<any> {
+    let tick = 0
+    while (true) {
+      if (tick >= duration) { break }
+      tick += global.deltaTime
+      yield null
+    }
+  })
+}
+
 const System = {
-  startCoroutine
+  startCoroutine,
+  sleep
 }
 
 export default System

@@ -1,10 +1,11 @@
 import Hex from "../modules/Hex";
 import Hexagon from "./Hexagon";
 
-type AStarNode = Hex & {
+type AStarNode = AxialHex & {
   f: number;
   g: number;
   h: number;
+  block: boolean;
   debug: any;
   parent: AStarNode;
   neighbors: AStarNode[];
@@ -44,7 +45,7 @@ const AStar = {
     return grid[x][y]
   },
 
-  search: function (board: Array<Array<Hex>>, _start: AxialHex, _end: AxialHex): AxialHex[] {
+  search: function (board: Array<Array<AxialHex>>, _start: AxialHex, _end: AxialHex): AxialHex[] {
     const grid = AStar.init(board as Array<Array<AStarNode>>)
 
     const start = AStar.getBoardHex(_start, grid)
@@ -63,7 +64,7 @@ const AStar = {
         }
       }
       let current = openList[lowestIndex]
-      if (current === end) {
+      if (Hexagon.axialEqual(current, end)) {
         let temp = current
         path.push(temp)
         while (temp.parent) {

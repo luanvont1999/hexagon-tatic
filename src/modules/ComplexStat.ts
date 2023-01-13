@@ -1,6 +1,6 @@
 import STAT, { COMPLEX_STAT } from "../constants/StatConstants";
 import { EntityStat } from "./Entity";
-import Stat, { BASE_STAT } from "./Stat";
+import Stat from "./Stat";
 
 class ComplexStat extends Stat {
   constructor ({ name, value } : { name: string, value: EntityStat}) {
@@ -16,7 +16,7 @@ class ComplexStat extends Stat {
     const result = formula.replace(/{(\w+)}/g, (match, key): string => {
       return `${stats[key as keyof EntityStat].finalValue}`
     })
-    this.baseValue = eval(result) || 0
+    this.baseValue = Math.round(eval(result) || 0)
   }
 }
 

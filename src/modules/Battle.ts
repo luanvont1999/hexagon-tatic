@@ -4,17 +4,39 @@ import Camera from "./Camera";
 import Draw from "./Draw";
 import Hex from "./Hex";
 import Entity from "./Entity";
+import helpers from "../helpers";
 
-type BoardProps = Array<Array<Hex & { color?: string }>>;
+type BoardProps = Array<Array<Hex>>;
 
 const fakeBoardEntity = [
-  { pos: { x: 0, y: 1 }, side: 'ally' },
-  { pos: { x: 0, y: 3 }, side: 'ally' },
-  { pos: { x: 0, y: 5 }, side: 'ally' },
-  { pos: { x: 9, y: 1 }, side: 'enemy' },
-  { pos: { x: 9, y: 3 }, side: 'enemy' },
-  { pos: { x: 9, y: 5 }, side: 'enemy' },
+  {
+    side: 'team1',
+    allies: [
+      { pos: { x: 0, y: 1 }, dir: 1 },
+      { pos: { x: 0, y: 3 }, dir: 1 },
+      { pos: { x: 0, y: 5 }, dir: 1 },
+    ],
+    color: 'green',
+    enemyTeams: ['team2']
+  },
+  {
+    side: 'team2',
+    allies: [
+      { pos: { x: 7, y: 1 }, dir: -1 },
+      { pos: { x: 7, y: 3 }, dir: -1 },
+      { pos: { x: 7, y: 5 }, dir: -1 },
+    ],
+    color: 'red',
+    enemyTeams: ['team1']
+  }
 ]
+
+export type Team = {
+  side: string;
+  color: string;
+  allies: Array<Hex>;
+  enemiesTeam: Array<Team>;
+}
 
 class Battle {
   board: BoardProps;
@@ -26,26 +48,70 @@ class Battle {
   count: number = 0;
   canAction: boolean = true
 
-  allies: Hex[] = []
-  enemies: Hex[] = []
+  teams: Record<string, Team> = {}
 
-  constructor(board: BoardProps) {
+  constructor(board: BoardProps = []) {
     this.board = board;
 
-    fakeBoardEntity.forEach(unit => {
-      this.addHexEntity(unit.pos, unit.side === 'ally')
+    for (let r = 0; r < 8; r++) {
+      if (board.length < r + 1) {
+        this.board.push([])
+      }
+      for (let q = 0; q < 10; q++) {
+        this.board[r].push(new Hex({ battle: this, r, q: q - Math.floor(r / 2)}))
+      }
+    }
+
+    fakeBoardEntity.forEach(team => {
+      const { side, allies, enemyTeams, color } = team
+      if (!(side in this.teams)) {
+        this.teams[side] = {
+          side,
+          allies: [],
+          enemiesTeam: [],
+          color: color || helpers.getRandomColor()
+        }
+      }
+      this.teams[side].color = color || helpers.getRandomColor()
+      enemyTeams.forEach((eTeam) => {
+        if (!(eTeam in this.teams)) {
+          this.teams[eTeam] = {
+            side: eTeam,
+            allies: [],
+            enemiesTeam: [],
+            color: helpers.getRandomColor()
+          }
+        }
+        this.teams[side].enemiesTeam.push(this.teams[eTeam])
+      })
+      allies.forEach(unit => {
+        this.addHexEntity(unit.pos, this.teams[side], unit.dir as -1 | 1)
+      })
     })
 
+    const btnStart = document.getElementById('btn-start')
+
+    btnStart?.addEventListener('click', () => {
+      this.startBattle()
+    })
     canvas.addEventListener('click', this.mouseClickHandler.bind(this))
-    canvas.addEventListener('mousemove', this.mouseMoveHandler.bind(this))
+    // canvas.addEventListener('mousemove', this.mouseMoveHandler.bind(this))
   }
 
-  addHexEntity(pos: Pos, side: boolean) {
-    const arr = side ? this.allies : this.enemies
-    const hex = new Hex(this.board[pos.y][pos.x])
-    hex.owner = new Entity({ hex, dir: side ? 1 : -1 })
-    arr.push(hex)
-    this.board[pos.y][pos.x].block = true
+  addHexEntity(pos: Pos, team: Team, dir: -1 | 1 = 1) {
+    const hex = new Hex({ battle: this, ...this.board[pos.y][pos.x], team })
+    hex.owner = new Entity({ hex, dir })
+    team.allies.push(hex)
+    // this.board[pos.y][pos.x].block = true
+  }
+
+  async startBattle() {
+    const all = this.getAllTeamMembers()
+    while (true) {
+      let i = 0;
+      await all[i].owner.action()
+      i = i >= all.length ? 0 : i + 1
+    }
   }
 
   async mouseClickHandler (event: MouseEvent) {
@@ -68,15 +134,18 @@ class Battle {
       if (!this.board[x][y].block) {
         this.canAction = false
         const { x: xPrev, y: yPrev } = Hexagon.axialToStore(this.select)
-        this.board[xPrev][yPrev].block = false
         await this.select.move(this.path)
-        this.board[x][y].block = true
         this.select = null
         this.canAction = true
       }
     } else {
-      this.select = this.allies.find(hex => Hexagon.axialEqual(hex, { r, q})) || this.enemies.find(hex => Hexagon.axialEqual(hex, { r, q}))
+      // this.select = this.getAllTeamMembers().find(hex => Hexagon.axialEqual(hex, { r, q}))
+      this.getAllTeamMembers().find(hex => Hexagon.axialEqual(hex, { r, q}))?.owner.action()
     }
+  }
+
+  getAllTeamMembers(): Array<Hex> {
+    return Object.values(this.teams).map(team => team.allies).flat()
   }
 
   mouseMoveHandler (event: MouseEvent) {
@@ -90,7 +159,7 @@ class Battle {
 
     if (this.board[x][y]?.block) return
 
-    const _hover = new Hex(this.board[x][y])
+    const _hover = new Hex({ battle: this, ...this.board[x][y]})
     if (_hover.r !== this.hover?.r || _hover.q !== this.hover?.q) {
       this.hover = _hover
 
@@ -100,32 +169,24 @@ class Battle {
   }
 
   render() {
+    const allMembers = this.getAllTeamMembers()
     this.board?.map((row) => {
       row?.map((hex) => {
         const { x, y } = Hexagon.hexToPixel(hex)
 
-        let color = hex.color
-        if (this.select) {
-          for (let i = 0; i < 6; i++) {
-            const neighbor = Hexagon.axialNeighbor(this.select, i)
-            if (neighbor) {
-              if (hex.q === neighbor.q && hex.r === neighbor.r) color = 'lightyellow'
-            }
-          }
-        }
-        if (hex.block) color = 'gray'
+        let color = 'white'
 
+        if (hex.block) color = 'gray'
         Draw.drawHex({ x, y, size: HEX_SIZE }, color)
 
       });
     });
-
-    this.allies?.length && this.allies.forEach(hex => {
-      const { x, y } = Hexagon.hexToPixel(hex)
-      hex?.owner?.render()
-    })
-    this.enemies?.length && this.enemies.forEach(hex => {
-      const { x, y } = Hexagon.hexToPixel(hex)
+    allMembers.sort((a, b) => {
+      if (a.r > b.r) return 1
+      if (a.r < b.r) return -1
+      return 0
+    }).forEach(hex => {
+      hex.render()
       hex?.owner?.render()
     })
     this.path?.length && this.path?.forEach(hex => {

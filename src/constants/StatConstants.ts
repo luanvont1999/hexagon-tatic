@@ -1,4 +1,10 @@
-import { BASE_STAT } from "../modules/Stat"
+export enum BASE_STAT {
+  STR = 'strength',
+  AGI = 'agility',
+  VIT = 'vitality',
+  INT = 'intellegent',
+  RAN = 'attack_range'
+}
 
 export enum COMPLEX_STAT {
   HP = 'health_point',
@@ -15,7 +21,7 @@ const COMPLEX_STAT_FORMULA: Record<COMPLEX_STAT, string> = {
   [COMPLEX_STAT.PD]: `{${BASE_STAT.STR}} * 3`,
   [COMPLEX_STAT.MD]: `{${BASE_STAT.INT}} * 3`,
   [COMPLEX_STAT.AS]: `{${BASE_STAT.AGI}} * 1.5`,
-  [COMPLEX_STAT.MS]: `{${BASE_STAT.AGI}} * 10`
+  [COMPLEX_STAT.MS]: `{${BASE_STAT.AGI}} * 1`
 }
 
 const STAT = {

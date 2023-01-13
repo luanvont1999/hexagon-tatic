@@ -19,6 +19,22 @@ export const drawHex = (hex: Hexagon, color: string = "white") => {
   ctx.fill();
 };
 
+export const strokeHex = (hex: Hexagon, thickness: number = 1, color: string = "white") => {
+  let { x, y, size } = Camera.inCam(hex);
+  let _thickness = Camera.inCam(thickness)
+  size = size - thickness / 2
+  ctx.beginPath();
+  for (var i = 0; i < 6; i++) {
+    ctx.lineTo(x + size * Math.sin(A * i), y + size * Math.cos(A * i));
+  }
+  ctx.closePath();
+  ctx.save()
+  ctx.strokeStyle = color;
+  ctx.lineWidth = _thickness;
+  ctx.stroke()
+  ctx.restore()
+};
+
 export const drawRect = (rect: Rect) => {
   const { x, y, width, height } = Camera.inCam(rect);
   ctx.fillStyle = "white";
@@ -65,6 +81,7 @@ export const drawImage = (source: CanvasImageSource, pos: Pos, frame: number = 0
 const Draw = {
   clearScreen,
   drawHex,
+  strokeHex,
   drawRect,
   drawText,
   drawImage

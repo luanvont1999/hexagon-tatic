@@ -26,7 +26,7 @@ const axialSubtract = (a: AxialHex, b: AxialHex): AxialHex => {
 }
 
 const axialEqual = (a: AxialHex, b: AxialHex): boolean => {
-  return a.r === b.r && a.q === b.q
+  return a?.r === b?.r && a?.q === b?.q
 }
  
 const axialIsLeft = (a: AxialHex, b: AxialHex): boolean => {
@@ -118,6 +118,26 @@ const lerp = (a: number, b: number, t: number) => {
   return a + (b - a) * t
 }
 
+const isNeighbor = (a: AxialHex, b: AxialHex) => {
+  const neighbors = getAxialNeighbors(b)
+  return neighbors.some(nei => axialEqual(a, nei))
+}
+
+const isInRange = (a: AxialHex, b: AxialHex, range: number): boolean => {
+  const sub = axialSubtract(a, b)
+  return Math.abs(sub.r) <= range && Math.abs(sub.q) <= range
+}
+
+const isExistOnBoard = (board: Array<Array<Hex>>, hex: AxialHex): boolean => {
+  const { x, y } = axialToStore(hex)
+  return !(
+    x < 0 ||
+    x >= board.length ||
+    y < 0 ||
+    y >= board[x].length
+  )
+}
+
 const Hexagon = {
   axialAdd,
   axialSubtract,
@@ -133,7 +153,10 @@ const Hexagon = {
   pixelToHex,
   hexToPixel,
   axialToStore,
-  lerp
+  lerp,
+  isNeighbor,
+  isInRange,
+  isExistOnBoard
 }
 
 export default Hexagon

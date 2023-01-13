@@ -1,10 +1,3 @@
-export enum BASE_STAT {
-  STR = 'strength',
-  AGI = 'agility',
-  VIT = 'vitality',
-  INT = 'intellegent',
-}
-
 export type StatModifier = {
   source: string;
   value: number;

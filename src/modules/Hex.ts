@@ -1,28 +1,42 @@
 import Hexagon from "../algorithm/Hexagon";
+import Battle, { Team } from "./Battle";
+import Draw from "./Draw";
 import Character, { CHAR_STATUS } from "./Entity";
 import System from "./System";
 
 class Hex {
+  battle?: Battle;
+  team?: Team;
   q: number;
   r: number;
   owner?: Character;
   block?: boolean;
+  color?: string = 'white';
   
   constructor ({
+    battle,
+    team,
     q, r,
+    color,
     owner = null,
     block = false,
   } : {
+    battle?: Battle;
+    team?: Team;
     q: number;
     r: number;
+    color?: string;
     owner?: Character;
     block?: boolean
-    
   } ) {
+    this.battle = battle
+    this.team = team
+
     this.q = q
     this.r = r
     this.owner = owner
     this.block = block
+    this.color = team?.color || color || 'white'
   }
   
   updatePos? (vec: AxialHex) {
@@ -64,6 +78,11 @@ class Hex {
     this.owner.startAnimate(CHAR_STATUS.WALK)
     await System.startCoroutine(startMove.bind(this))
     this.owner.startAnimate(CHAR_STATUS.IDLE)
+  }
+
+  render() {
+    const { x, y } = Hexagon.hexToPixel(this as AxialHex)
+    Draw.strokeHex({ x, y, size: HEX_SIZE }, 10, this.color)
   }
 }
 
