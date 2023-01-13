@@ -21,7 +21,7 @@ APP.appendChild(CANVAS);
 const btnStart = document.createElement('button')
 btnStart.innerText = 'START'
 btnStart.id = 'btn-start'
-// APP.appendChild(btnStart)
+APP.appendChild(btnStart)
 
 document.body.appendChild(APP);
 const battle = new Battle([])

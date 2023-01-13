@@ -168,7 +168,7 @@ const generateRandomBaseStat = (): Record<BASE_STAT, number>  => {
     sum += rand
     stats[stat as keyof Record<BASE_STAT, number>] = rand
   }
-  stats[BASE_STAT.AGI] = total - (sum - stats[BASE_STAT.AGI])
+  stats[BASE_STAT.AGI] = Math.max(1, total - (sum - stats[BASE_STAT.AGI]))
   stats[BASE_STAT.RAN] = 1
 
   return stats

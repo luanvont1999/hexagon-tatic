@@ -107,10 +107,12 @@ class Battle {
 
   async startBattle() {
     const all = this.getAllTeamMembers()
+    let i = 0;
     while (true) {
-      let i = 0;
-      await all[i].owner.action()
-      i = i >= all.length ? 0 : i + 1
+      console.log('action start', i % all.length)
+      await all[i % all.length].owner.action()
+      console.log('action done', i % all.length)
+      i++
     }
   }
 
