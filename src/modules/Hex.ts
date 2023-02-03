@@ -46,6 +46,8 @@ class Hex {
 	}
 
 	async move(path: AxialHex[]) {
+		const timeToMove = this.owner.sprites.walk.duration
+
 		function* startMove(): Generator<any> {
 			if (!path.length) return
 
@@ -56,11 +58,11 @@ class Hex {
 
 			while (true) {
 				this.updatePos({
-					r: Hexagon.lerp(currPos.r, nextPos.r, tick / 500),
-					q: Hexagon.lerp(currPos.q, nextPos.q, tick / 500),
+					r: Hexagon.lerp(currPos.r, nextPos.r, tick / timeToMove),
+					q: Hexagon.lerp(currPos.q, nextPos.q, tick / timeToMove),
 				})
 
-				if (tick >= 500) {
+				if (tick >= timeToMove) {
 					tick = 0
 					currPos = nextPos
 					if (!path.length) {
@@ -76,7 +78,7 @@ class Hex {
 			}
 		}
 
-		this.owner.startAnimate(CHAR_STATUS.WALK)
+		this.owner.startAnimate(CHAR_STATUS.WALK, timeToMove * path.length - 1)
 		await System.startCoroutine(startMove.bind(this))
 		this.owner.startAnimate(CHAR_STATUS.IDLE)
 	}

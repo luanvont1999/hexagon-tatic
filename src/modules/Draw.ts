@@ -61,6 +61,7 @@ export const drawImage = (
 	source: CanvasImageSource,
 	rect: Rect,
 	frame: number = 0,
+	offset: Pos,
 	dir: -1 | 1 = 1
 ): void => {
 	let { x, y, width, height } = Camera.inCam(rect)
@@ -74,8 +75,8 @@ export const drawImage = (
 	}
 	ctx.drawImage(
 		source,
-		frame * width,
-		0,
+		offset.x + frame * width,
+		offset.y,
 		width,
 		height,
 		0,

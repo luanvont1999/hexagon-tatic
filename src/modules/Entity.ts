@@ -85,27 +85,27 @@ class Entity {
 		})
 	}
 
-	startAnimate(status: CHAR_STATUS) {
+	startAnimate(status: CHAR_STATUS, long: number = 0) {
 		this.status = status
 		switch (status) {
 			case CHAR_STATUS.IDLE: {
-				this.maxFrame = 6
-				this.frame = 0
+				this.animate = this.sprites.idle
+				this.animate.startAnimate()
 				break
 			}
 			case CHAR_STATUS.WALK: {
-				this.animate = this.sprites.idle
-				this.animate.startAnimate(2000)
+				this.animate = this.sprites.walk
+				this.animate.startAnimate(long)
 				break
 			}
 			case CHAR_STATUS.ATTACK: {
-				this.maxFrame = 6
-				this.frame = 0
+				this.animate = this.sprites.attack
+				this.animate.startAnimate(long)
 				break
 			}
 			default: {
-				this.maxFrame = 0
-				this.frame = 0
+				this.animate = this.sprites.idle
+				this.animate.startAnimate()
 			}
 		}
 	}
@@ -154,8 +154,8 @@ class Entity {
 	}
 
 	async attack() {
-		this.startAnimate(CHAR_STATUS.ATTACK)
-		await System.sleep(1000)
+		this.startAnimate(CHAR_STATUS.ATTACK, this.sprites.attack.duration)
+		await System.sleep(this.sprites.attack.duration)
 		this.startAnimate(CHAR_STATUS.IDLE)
 	}
 

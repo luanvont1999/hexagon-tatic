@@ -44,15 +44,23 @@ class AnimateSprite {
 		this.frameH = frameH
 		this.transform = transform
 		this.duration = duration
+		this.frame = 0
 	}
 
-	async startAnimate(duration: number) {
+	async startAnimate(long?: number) {
 		const that = this
 		await System.startCoroutine(function* (): Generator<any> {
 			let tick = 0
 			while (true) {
-				if (tick >= duration) {
+				if (tick >= long) {
+					that.frame = 0
 					break
+				}
+				that.frame = Math.floor(
+					(tick % that.duration) / (that.duration / that.frames)
+				)
+				if (that.frame >= that.frames) {
+					that.frame = 0
 				}
 				tick += global.deltaTime
 				yield null
@@ -63,13 +71,14 @@ class AnimateSprite {
 	render(pos: Pos, dir: -1 | 1) {
 		const { x: xOrigin, y: yOrigin } = pos
 
-		const x = xOrigin + this.transform.x
+		const x = xOrigin + this.transform.x * dir
 		const y = yOrigin + this.transform.y
 
 		Draw.drawImage(
 			this.src,
 			{ x, y, width: this.frameW, height: this.frameH },
 			this.frame,
+			{ x: this.offsetX, y: this.offsetY },
 			dir
 		)
 	}
