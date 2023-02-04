@@ -3,6 +3,7 @@ import Battle, { Team } from './Battle'
 import Draw from './Draw'
 import Character, { CHAR_STATUS } from './Entity'
 import System from './System'
+import { changeHexBlock } from '../helpers/board'
 
 class Hex {
 	battle?: Battle
@@ -54,6 +55,8 @@ class Hex {
 			let tick = 0
 			let currPos = { ...this }
 			let nextPos = path.splice(0, 1)[0]
+			changeHexBlock(this.battle, currPos, false)
+			changeHexBlock(this.battle, nextPos, true)
 			this.owner.dir = Hexagon.axialIsLeft(nextPos, currPos) ? -1 : 1
 
 			while (true) {
@@ -71,6 +74,8 @@ class Hex {
 					}
 					nextPos = path.splice(0, 1)[0]
 					this.owner.dir = Hexagon.axialIsLeft(nextPos, currPos) ? -1 : 1
+					changeHexBlock(this.battle, currPos, false)
+					changeHexBlock(this.battle, nextPos, true)
 				}
 				tick += global.deltaTime
 
@@ -85,6 +90,7 @@ class Hex {
 
 	render() {
 		const { x, y } = Hexagon.hexToPixel(this as AxialHex)
+
 		Draw.strokeHex({ x, y, size: HEX_SIZE }, 10, this.color)
 	}
 }

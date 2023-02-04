@@ -21,7 +21,7 @@ const Skeletrooper: MonsterData = {
 			src: 'sprites/specter.png',
 			name: 'specter.png',
 			offsetX: 0,
-			offsetY: 0,
+			offsetY: -1,
 			frames: 6,
 			frameW: 104,
 			frameH: 87,
